@@ -1,0 +1,6 @@
+{
+    "git.decorations.enabled": true,
+    "git.openRepositoryInParentFolders": "always",
+    "explorer.decorations.badges": true,
+    "explorer.decorations.colors": true
+}
