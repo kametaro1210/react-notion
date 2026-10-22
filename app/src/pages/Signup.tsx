@@ -1,65 +1,103 @@
+import { useState } from 'react';
+import { authRepository } from '../modules/auth/auth.repository';
 import '../styles/pages/auth.css';
 
 export default function Signup() {
+
+  // 入力された値（name/email/password）を保存する状態と、
+  // それを更新する関数（setName/setEmail/setPassword）を定義
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  // --------------------------------------------------------------------------------------
+
+  /* 
+    todo : 概要や処理フローを後ほど記載
+  */
+
+  const signup = async () => {
+
+    const { user, token } = await authRepository.signup(
+      name,
+      email,
+      password,
+    );
+
+    console.log(user, token)
+  };
+
+  // --------------------------------------------------------------------------------------
+
   return (
-    <div className='auth-container'>
-      <div className='auth-wrapper'>
-        <h2 className='auth-title'>Notionクローン</h2>
-        <div className='auth-form-container'>
-          <div className='auth-card'>
-            <div className='auth-form'>
+    <div className="auth-container">
+      <div className="auth-wrapper">
+        <h2 className="auth-title">Notion</h2>
+        <div className="auth-form-container">
+          <div className="auth-card">
+            <div className="auth-form">
+
               <div>
-                <label className='auth-label' htmlFor='username'>
+                <label className="auth-label" htmlFor="username">
                   ユーザー名
                 </label>
-                <div className='auth-input-container'>
+                <div className="auth-input-container">
                   <input
-                    onChange={() => {}}
-                    id='username'
-                    name='username'
-                    placeholder='ユーザー名'
+                    value={name}
+
+                    // 入力された値が変更されることに実行される関数
+                    onChange={(e) => setName(e.target.value)}
+                    id="username"
+                    name="username"
+                    placeholder="ユーザー名"
                     required
-                    type='text'
-                    className='input-auth'
+                    type="text"
+                    className="input-auth"
                   />
                 </div>
               </div>
+
               <div>
-                <label className='auth-label' htmlFor='email'>
+                <label className="auth-label" htmlFor="email">
                   メールアドレス
                 </label>
-                <div className='auth-input-container'>
+                <div className="auth-input-container">
                   <input
-                    onChange={() => {}}
-                    id='email'
-                    name='email'
-                    placeholder='メールアドレス'
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    id="email"
+                    name="email"
+                    placeholder="メールアドレス"
                     required
-                    type='email'
-                    className='input-auth'
+                    type="email"
+                    className="input-auth"
                   />
                 </div>
               </div>
+
               <div>
-                <label className='auth-label' htmlFor='password'>
+                <label className="auth-label" htmlFor="password">
                   パスワード
                 </label>
-                <div className='auth-input-container'>
+                <div className="auth-input-container">
                   <input
-                    onChange={() => {}}
-                    id='password'
-                    name='password'
-                    placeholder='パスワード'
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    id="password"
+                    name="password"
+                    placeholder="パスワード"
                     required
-                    type='password'
-                    className='input-auth'
+                    type="password"
+                    className="input-auth"
                   />
                 </div>
               </div>
+
               <div>
                 <button
-                  onClick={() => {}}
-                  className='home-button'
+                  disabled={ !name || !email || !password }
+                  onClick={signup}
+                  className="home-button"
                   style={{ width: '100%' }}
                 >
                   登録
