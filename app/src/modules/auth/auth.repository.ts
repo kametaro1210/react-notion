@@ -31,4 +31,30 @@ export const authRepository = {
         const { user, token } = result.data;
         return { user: new User(user), token };
     },
-};
+
+// --------------------------------------------------------------------------
+
+    /*
+    サインイン(ログイン)処理
+
+    【目的】
+    受け取ったメールアドレスとパスワードをサーバーに送信し、
+    サーバーから受け取ったユーザー情報と認証トークンを呼び出し元に返す役割を持つ。
+
+    【処理フロー】
+    1. async関数は処理結果をPromiseとして返し、awaitでサーバーの応答を待つ。
+    2. email・passwordをAPIに送信し、サインイン結果をresult.dataで受け取る。
+    3. result.dataからuserとtokenを分割代入で取り出す。
+    4. userをUserクラスのインスタンスにし、userとtokenをオブジェクトで返す。
+    */
+
+    async signin(
+        email: string,
+        password: string,
+    ): Promise<{ user: User; token: string }> {
+        const result = await api.post('/auth/signin', { email, password });
+        const { user, token } = result.data;
+        return { user: new User(user), token };
+    },
+    
+    };
