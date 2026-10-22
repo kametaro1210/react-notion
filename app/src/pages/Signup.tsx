@@ -1,5 +1,8 @@
+import { useAtom } from 'jotai';
 import { useState } from 'react';
+import { Navigate } from 'react-router-dom';
 import { authRepository } from '../modules/auth/auth.repository';
+import { currentUserAtom } from '../modules/auth/current-user.state';
 import '../styles/pages/auth.css';
 
 export default function Signup() {
@@ -9,6 +12,9 @@ export default function Signup() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
+  // アプリ全体で共有するログイン中のユーザー情報と更新関数
+  const [currentUser, setCurrentUser] = useAtom(currentUserAtom);
 
   // --------------------------------------------------------------------------------------
 
@@ -24,10 +30,18 @@ export default function Signup() {
       password,
     );
 
-    console.log(user, token)
+    // console.log(user, token)
+
+    setCurrentUser(user);
+
+    
+
   };
 
   // --------------------------------------------------------------------------------------
+
+
+  if (currentUser) return <Navigate to="/" replace />;
 
   return (
     <div className="auth-container">
