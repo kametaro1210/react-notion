@@ -56,5 +56,27 @@ export const authRepository = {
         const { user, token } = result.data;
         return { user: new User(user), token };
     },
+
+// --------------------------------------------------------------------------
+
+    /*
+    ログイン中のユーザー情報を取得する処理
+
+    【目的】
+    サーバーに現在のログイン状態を確認し、
+    ログイン中のユーザー情報を呼び出し元に返す役割を持つ。
+
+    【処理フロー】
+    1. /auth/meにリクエストを送り、サーバーからの応答を待つ。
+    2. result.dataにユーザー情報がない場合は、ユーザーがいないことを示すundefinedを返す。
+    3. ユーザー情報がある場合は、Userクラスのインスタンスにして呼び出し元に返す。
+    */
+
+    async getCurrentUser(): Promise<User | undefined> {
+        const result = await api.get('/auth/me');
+        if (!result.data) return undefined;
+
+        return new User(result.data);
+    },
     
     };

@@ -16,26 +16,49 @@ export default function Signup() {
   // アプリ全体で共有するログイン中のユーザー情報と更新関数
   const [currentUser, setCurrentUser] = useAtom(currentUserAtom);
 
+  // アカウント作成の通信中かどうかを記録する状態と、その状態を更新する関数
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   // --------------------------------------------------------------------------------------
 
-  /* 
-    todo : 概要や処理フローを後ほど記載
+  /*
+    アカウント作成処理(サインアップ)
+
+    【目的】
+    入力されたユーザー名、メールアドレス、パスワードを使ってアカウントを作成し、
+    成功した場合はログイン状態を保存する。
+
+    【処理フロー】
+    1. setIsSubmitting(true)を呼び出し、アカウント作成の通信中であることを記録する。
+        この間は登録ボタンが押せない状態になる。
+    2. authRepository.signupに入力内容を渡してアカウント作成を依頼し、
+        完了するまで待つ。
+    3. 作成に成功したら、受け取ったユーザー情報をアプリ全体で使う状態に保存し、
+        受け取ったトークンをブラウザーに保存する。
+    4. 失敗した場合は、エラーをコンソールに表示し、ユーザー登録に失敗したことを知らせる。
+    5. 成功・失敗にかかわらず、最後にsetIsSubmitting(false)を呼び出し、
+        通信中の状態を解除して登録ボタンを押せるようにする。
   */
 
   const signup = async () => {
 
-    const { user, token } = await authRepository.signup(
-      name,
-      email,
-      password,
-    );
-
-    // console.log(user, token)
-
-    setCurrentUser(user);
-
+    setIsSubmitting(true);
     
-
+    try {
+      const { user, token } = await authRepository.signup(
+        name,
+        email,
+        password,
+      );
+      // console.log(user, token)
+      setCurrentUser(user);
+      localStorage.setItem('token', token);
+    } catch (error) {
+      console.error(error);
+      alert('ユーザー登録に失敗しました');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // --------------------------------------------------------------------------------------
@@ -109,7 +132,8 @@ export default function Signup() {
 
               <div>
                 <button
-                  disabled={ !name || !email || !password }
+                  // 必須項目が未入力、またはアカウント作成中の場合は登録ボタンを無効にする
+                  disabled={ !name || !email || !password || isSubmitting}
                   onClick={signup}
                   className="home-button"
                   style={{ width: '100%' }}
