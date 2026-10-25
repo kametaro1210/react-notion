@@ -3,6 +3,15 @@ import { Note } from './note.entity';
 
 export const noteRepository = {
 
+  /*
+    todo 概要や処理フローは後ほど記載
+  */
+
+  async find(): Promise<Note[]> {
+    const result = await api.get('/notes')
+    return result.data.notes.map((data: Note) => new Note(data));
+  },
+
 // ------------------------------------------------------------------------------
 
   /*

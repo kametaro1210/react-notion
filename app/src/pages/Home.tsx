@@ -7,6 +7,7 @@ import {
   CardTitle,
 } from '../components/ui/card';
 import { noteRepository } from '../modules/notes/note.repository';
+import { useNoteStore } from '../modules/notes/notes.state';
 import '../styles/pages/home.css';
 
 export default function Home() {
@@ -16,6 +17,10 @@ export default function Home() {
 
   // APIの通信中（送信中）かどうかを表すフラグステート（true: 通信中 / false: 待機中）
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // ノート一覧を取得したり、更新したりする機能を使えるようにする。
+  const noteStore = useNoteStore();
+
 
   /*
     todo : 処理フローや概要は後ほど記載
@@ -27,6 +32,7 @@ export default function Home() {
 
     try {
       const newNote = await noteRepository.create({ title });
+      noteStore.set([newNote]);
       setTitle('');
       console.log(newNote)
     } catch (error) {
