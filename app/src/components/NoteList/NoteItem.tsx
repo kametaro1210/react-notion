@@ -1,20 +1,25 @@
 import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from '../ui/dropdown-menu';
-import {
-  FiChevronDown,
   FiChevronRight,
-  FiFile,
   FiMoreHorizontal,
   FiPlus,
-  FiTrash2,
+  FiTrash2
 } from 'react-icons/fi';
+import { Note } from '../../modules/notes/note.entity';
 import Item from '../SideBar/Item';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '../ui/dropdown-menu';
 
-export default function NoteItem() {
+// この画面に渡す情報として、Note型のノートを受け取ることを決める。
+interface Props {
+  note: Note;
+}
+
+// 渡されたPropsからnoteを取り出し、この部品の中で使う。
+export default function NoteItem({ note } : Props) {
   const menu = (
     <div className='note-item-menu-container'>
       <DropdownMenu>
@@ -43,7 +48,7 @@ export default function NoteItem() {
 
   return (
     <div role='button' style={{ paddingLeft: '12px' }}>
-      <Item label={'無題'} icon={FiChevronRight} trailingItem={menu} />
+      <Item label={note.title ?? '無題'} icon={FiChevronRight} trailingItem={menu} />
     </div>
   );
 }
