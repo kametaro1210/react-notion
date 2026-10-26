@@ -51,6 +51,31 @@ export default function NoteDetail() {
 
   // ------------------------------------------------------------------
 
+  /*
+    ノート情報の更新処理
+
+    【目的】
+    指定したノートの内容を更新し、更新後の情報をアプリ内にも反映する。
+
+    【処理フロー】
+    1. URLから取得したidと、TitleInputで入力されたtitleを受け取る。
+        onTitleChangeからupdateNote(id, { title })として呼び出される。
+    2. 受け取ったidとtitleやcontentをnoteRepository.updateに渡し、ノートを更新する。
+    3. APIから返された更新後のノートをnoteStore.set()でアプリ内に保存する。
+    4. 更新後のノートをreturnし、呼び出し元で使えるようにする。
+  */
+
+  const updateNote = async (
+    id: number,
+    note: { title?: string; content?: string },
+  ) => {
+    const updatedNote = await noteRepository.update(id, note);
+    noteStore.set([updatedNote]);
+    return updatedNote;
+  };
+
+  // ------------------------------------------------------------------
+
   // ノートをAPIから読み込み中の間は、空の画面を表示する。
   if (isLoading) return <div />;
 
@@ -60,7 +85,10 @@ export default function NoteDetail() {
   return (
     <div className="note-detail-container">
       <div className="note-detail-content">
-        <TitleInput initialData={note} />
+        <TitleInput 
+          initialData={note} 
+          onTitleChange={(title) => updateNote(id, { title })}
+        />
       </div>
     </div>
   );
