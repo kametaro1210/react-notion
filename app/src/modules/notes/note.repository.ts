@@ -4,11 +4,29 @@ import { Note } from './note.entity';
 export const noteRepository = {
 
   /*
-    todo 概要や処理フローは後ほど記載
+    ノート一覧の取得処理
+
+    【目的】
+    条件に合うノート一覧をAPIから取得し、アプリで使える形にして返す。
+
+    【処理フロー】
+    1. 必要に応じて親ノートID(parentId)や検索キーワード(keyword)を指定する。
+        options自体と各項目は省略できる。
+    2. awaitで/notesへの取得結果を待ち、指定した条件をAPIに渡す。
+    3. 取得したノートごとにNoteを作成し、一覧としてreturnする。
+        Promise<Note[]>は、処理完了後にNoteの一覧を返すことを表す。
   */
 
-  async find(): Promise<Note[]> {
-    const result = await api.get('/notes')
+  async find(options?: {
+    parentId?: number;
+    keyword?: string;
+  }): Promise<Note[]> {
+    const result = await api.get('/notes', {
+      params: {
+        parentId: options?.parentId,
+        keyword: options?.keyword,
+      },
+    });
     return result.data.notes.map((data: Note) => new Note(data));
   },
 
