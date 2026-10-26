@@ -23,6 +23,8 @@ interface Props {
   // 省略可能で、マウス操作の情報を受け取り、値を返さない関数を指定する。
   onCreate?: (event: React.MouseEvent) => void;
   onExpand?: (event: React.MouseEvent) => void;
+
+  layer?: number;
 }
 
 // 渡されたPropsからnoteを取り出し、この部品の中で使う。
@@ -30,6 +32,7 @@ export default function NoteItem({
   note,
   onCreate,
   onExpand,
+  layer = 0
 } : Props) {
 
   // カーソルがノートに乗っているかを記録し、状態に応じてアイコンを切り替える。
@@ -74,7 +77,9 @@ export default function NoteItem({
       role='button' 
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      style={{ paddingLeft: '12px' }}
+
+      // 1階層ごとに12px間隔をあける
+      style={{ paddingLeft: `${layer * 12 + 12}px` }}
     >
       <Item 
         label={note.title ?? '無題'} 
