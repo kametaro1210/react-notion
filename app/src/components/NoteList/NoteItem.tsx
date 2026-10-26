@@ -13,13 +13,19 @@ import {
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
 
-// この画面に渡す情報として、Note型のノートを受け取ることを決める。
 interface Props {
+  // この画面に渡す情報として、Note型のノートを受け取ることを決める。
   note: Note;
+
+  // 省略可能で、マウス操作の情報を受け取り、値を返さない関数を指定する。
+  onCreate?: (event: React.MouseEvent) => void;
 }
 
 // 渡されたPropsからnoteを取り出し、この部品の中で使う。
-export default function NoteItem({ note } : Props) {
+export default function NoteItem({ 
+  note,
+  onCreate
+} : Props) {
   const menu = (
     <div className='note-item-menu-container'>
       <DropdownMenu>
@@ -40,7 +46,7 @@ export default function NoteItem({ note } : Props) {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      <div className='note-item-menu-button' role='button' onClick={() => {}}>
+      <div className='note-item-menu-button' role='button' onClick={onCreate}>
         <FiPlus className='note-item-menu-icon' size={16} />
       </div>
     </div>
