@@ -57,4 +57,21 @@ export const noteRepository = {
 
 // ------------------------------------------------------------------------------
 
+  /*
+    指定したノートの取得処理
+
+    【目的】
+    指定されたIDのノートをAPIから取得し、Noteとして返す。
+
+    【処理フロー】
+    1. idを使ってAPIにノートの取得を依頼し、awaitで応答を待つ。
+    2. 応答データからNoteを作成して返す。
+        Promise<Note>は、処理完了後にNoteを返すことを表す。
+  */
+
+  async findOne(id: number): Promise<Note> {
+    const result = await api.get(`/notes/${id}`);
+    return new Note(result.data);
+  },
+
 };

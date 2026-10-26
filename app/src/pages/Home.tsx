@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { FiPlus } from 'react-icons/fi';
+import { useNavigate } from 'react-router-dom';
 import {
   Card,
   CardContent,
@@ -21,9 +22,23 @@ export default function Home() {
   // ノート一覧を取得したり、更新したりする機能を使えるようにする。
   const noteStore = useNoteStore();
 
+  // useNavigateが返す画面移動用の関数を保存し、作成したノートの画面へ移動できるようにする。
+  const navigate = useNavigate();
+
+  // -------------------------------------------------------------------------------
 
   /*
-    todo : 処理フローや概要は後ほど記載
+    Home画面からのノート新規作成処理
+
+    【目的】
+    入力されたタイトルでノートを作成し、作成したノートの詳細画面へ移動する。
+
+    【処理フロー】
+    1. setIsSubmitting(true)で作成中の状態にする。
+    2. noteRepository.create({ title })でAPIにノート作成を依頼し、結果を待つ。
+    3. 作成したノートを一覧に保存し、タイトル入力欄を空にする。
+    4. navigateで作成したノートの詳細画面へ移動する。
+    5. 失敗時はエラーを表示し、最後にsetIsSubmitting(false)で作成中の状態を解除する。
   */
 
   const createNote = async () => {
@@ -34,7 +49,8 @@ export default function Home() {
       const newNote = await noteRepository.create({ title });
       noteStore.set([newNote]);
       setTitle('');
-      console.log(newNote)
+      // console.log(newNote)
+      navigate(`/notes/${newNote.id}`);
     } catch (error) {
       console.error(error);
       alert('ノートの作成に失敗しました');
@@ -43,6 +59,8 @@ export default function Home() {
     }
 
   };
+
+  // -------------------------------------------------------------------------------
 
   return (
     <Card className='home-card'>

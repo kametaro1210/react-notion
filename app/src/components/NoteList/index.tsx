@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Note } from '../../modules/notes/note.entity';
 import { noteRepository } from '../../modules/notes/note.repository';
 import { useNoteStore } from '../../modules/notes/notes.state';
@@ -22,22 +23,40 @@ export default function NoteList({ layer = 0, parentId }: Props) {
   // 閉じている場合は、{2 : false} のようなデータを取得する
   const [expanded, setExpanded] = useState<Map<number, boolean>>(new Map());
 
+  // useNavigateが返す画面移動用の関数を保存し、
+  // 選んだノートの画面へ移動できるようにする。
+  const navigate = useNavigate();
 
-    /*
-      todo : 処理フローや概要は後ほど記載
-    */
+  // -------------------------------------------------------------------
 
-    const createChild = async (e: React.MouseEvent, parentId: number) => {
-      e.preventDefault();
-      const newNote = await noteRepository.create({ parentId });
-      // console.log(newNote)
-      noteStore.set([newNote]);
-      setExpanded((prev) => {
-        const newExpanded = new Map(prev);
-        newExpanded.set(parentId, true);
-        return newExpanded;
-      });
-    };
+  /*
+    子ノートの作成処理
+
+    【目的】
+    指定した親ノートの下に子ノートを作成し、その詳細画面を開く。
+
+    【処理フロー】
+    1. eはクリック操作の情報、parentIdは親ノートのID。
+    2. parentIdをAPIに渡して子ノートを作成する。
+    3. 作成したノートを一覧に追加し、setExpandedで親ノートの表示状態を更新する。
+        setExpandedに渡す関数は、引数prevで現在の表示状態を受け取る。
+        その内容をコピーしたnewExpandedでparentIdの状態をtrueにし、
+        returnで返したnewExpandedが新しい表示状態として使われる。
+    4. 作成したノートの詳細画面へ移動する。
+  */
+
+  const createChild = async (e: React.MouseEvent, parentId: number) => {
+    e.preventDefault();
+    const newNote = await noteRepository.create({ parentId });
+    // console.log(newNote)
+    noteStore.set([newNote]);
+    setExpanded((prev) => {
+      const newExpanded = new Map(prev);
+      newExpanded.set(parentId, true);
+      return newExpanded;
+    });
+    moveToDetail(newNote.id);
+  };
 
   // -------------------------------------------------------------------
 
@@ -73,6 +92,23 @@ export default function NoteList({ layer = 0, parentId }: Props) {
 
   // -------------------------------------------------------------------
 
+  /*
+    ノート詳細画面への移動処理
+
+    【目的】
+    指定したノートの詳細画面を表示する。
+
+    【処理フロー】
+    1. noteIdで表示するノートを指定する。
+    2. navigateにノートIDを含むURLを渡して、詳細画面へ移動する。
+  */
+
+  const moveToDetail = (noteId: number) => {
+    navigate(`/notes/${noteId}`);
+  };
+
+  // -------------------------------------------------------------------
+
   return (
     <>
       {/* note.parentIdとこの一覧のparentIdが一致するノートを表示する（最初の一覧では両方未設定の親ノートが対象） */}
@@ -99,6 +135,7 @@ export default function NoteList({ layer = 0, parentId }: Props) {
               onExpand={(e) => fetchChildren(e, note)}
               layer={layer}
               expanded={expanded.get(note.id)}
+              onClick={() => moveToDetail(note.id)}
             />
 
             {/* このノートのexpandedがtrueなら、子ノートの一覧を表示する。 */}

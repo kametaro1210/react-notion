@@ -27,6 +27,8 @@ interface Props {
 
   layer?: number;
   expanded?: boolean;
+
+  onClick: () => void;
 }
 
 // 渡されたPropsからnoteを取り出し、この部品の中で使う。
@@ -35,7 +37,8 @@ export default function NoteItem({
   onCreate,
   onExpand,
   layer = 0,
-  expanded = false
+  expanded = false,
+  onClick
 } : Props) {
 
   // カーソルがノートに乗っているかを記録し、状態に応じてアイコンを切り替える。
@@ -93,6 +96,8 @@ export default function NoteItem({
       role='button' 
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      
+      onClick={onClick}
 
       // 1階層ごとに12px間隔をあける
       style={{ paddingLeft: `${layer * 12 + 12}px` }}
