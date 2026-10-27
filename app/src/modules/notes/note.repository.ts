@@ -19,12 +19,12 @@ export const noteRepository = {
 
   async find(options?: {
     parentId?: number;
-    keyword?: string;
+    keyword?: string; 
   }): Promise<Note[]> {
     const result = await api.get('/notes', {
       params: {
         parentId: options?.parentId,
-        keyword: options?.keyword,
+        keyword: options?.keyword, 
       },
     });
     return result.data.notes.map((data: Note) => new Note(data));

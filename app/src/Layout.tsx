@@ -4,6 +4,7 @@ import { Navigate, Outlet } from 'react-router-dom';
 import SearchModal from './components/SearchModal';
 import SideBar from './components/SideBar';
 import { currentUserAtom } from './modules/auth/current-user.state';
+import { Note } from './modules/notes/note.entity';
 import { noteRepository } from './modules/notes/note.repository';
 import { useNoteStore } from './modules/notes/notes.state';
 import './styles/layout.css';
@@ -21,6 +22,9 @@ export default function Layout() {
 
   // 検索モーダルの開閉フラグ
   const [isShowModal, setIsShowModal] = useState(false);
+
+  // 検索結果を取得するステート
+  const [searchResult, setSearchResult] = useState<Note[]>([]);
 
   // -----------------------------------------------------------------------------
 
@@ -51,6 +55,27 @@ export default function Layout() {
   // -----------------------------------------------------------------------------
 
 
+  /*
+    ノート検索処理
+
+    【目的】
+    入力されたキーワードでノートを検索し、検索結果を画面に渡す。
+
+    【処理フロー】
+    1. keywordをAPIに渡し、検索結果をnotesとして受け取る。
+    2. 検索結果をnoteStore.set()でアプリ内のノート一覧に保存する。
+    3. setSearchResult(notes ?? [])で検索結果を保存する。
+        notesがnullまたはundefinedなら空の一覧[]を使い、それ以外ならnotesを使う。
+  */
+
+  const searchNotes = async (keyword: string) => {
+    const notes = await noteRepository.find({ keyword });
+    noteStore.set(notes);
+    setSearchResult(notes ?? []);
+  };
+
+  // -----------------------------------------------------------------------------
+
   // ログインしていない場合、ログイン画面へ遷移
   if (!currentUser) return <Navigate to="/signin" replace />;
 
@@ -74,6 +99,8 @@ export default function Layout() {
       <SearchModal 
         isOpen={isShowModal}
         onClose={() => setIsShowModal(false)}
+        notes={searchResult}
+        onKeywordChange={searchNotes}
       />
     </div>
   );
