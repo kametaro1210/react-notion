@@ -1,6 +1,6 @@
 import { useAtomValue } from 'jotai';
 import { useEffect, useState } from 'react';
-import { Navigate, Outlet } from 'react-router-dom';
+import { Navigate, Outlet, useNavigate } from 'react-router-dom';
 import SearchModal from './components/SearchModal';
 import SideBar from './components/SideBar';
 import { currentUserAtom } from './modules/auth/current-user.state';
@@ -25,6 +25,11 @@ export default function Layout() {
 
   // 検索結果を取得するステート
   const [searchResult, setSearchResult] = useState<Note[]>([]);
+
+  // useNavigateが返す画面移動用の関数を保存し、
+  // 選んだノートの画面へ移動できるようにする。
+  const navigate = useNavigate();
+
 
   // -----------------------------------------------------------------------------
 
@@ -54,7 +59,6 @@ export default function Layout() {
 
   // -----------------------------------------------------------------------------
 
-
   /*
     ノート検索処理
 
@@ -72,6 +76,25 @@ export default function Layout() {
     const notes = await noteRepository.find({ keyword });
     noteStore.set(notes);
     setSearchResult(notes ?? []);
+  };
+
+  // -----------------------------------------------------------------------------
+
+  /*
+    検索結果からノート詳細へ移動する処理
+
+    【目的】
+    選択したノートの詳細画面を開き、検索モーダルを閉じる。
+
+    【処理フロー】
+    1. 選択されたノートのID(noteId)を受け取る。
+    2. navigateでそのIDのノート詳細画面へ移動する。
+    3. setIsShowModal(false)で検索モーダルを閉じる。
+  */
+
+  const moveToDetail = (noteId: number) => {
+    navigate(`/notes/${noteId}`);
+    setIsShowModal(false);
   };
 
   // -----------------------------------------------------------------------------
@@ -101,6 +124,7 @@ export default function Layout() {
         onClose={() => setIsShowModal(false)}
         notes={searchResult}
         onKeywordChange={searchNotes}
+        onItemSelect={moveToDetail}
       />
     </div>
   );

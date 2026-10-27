@@ -16,13 +16,15 @@ interface Props {
   onClose: () => void;
   notes: Note[];
   onKeywordChange: (keyword: string) => void;
+  onItemSelect: (noteId: number) => void;
 }
 
 export default function SearchModal({
   isOpen, 
   onClose,
   notes,
-  onKeywordChange
+  onKeywordChange,
+  onItemSelect
 } : Props) {
 
   // ------------------------------------------------------------------
@@ -53,14 +55,23 @@ export default function SearchModal({
         <CommandList>
           <CommandEmpty>条件に一致するノートがありません</CommandEmpty>
           <CommandGroup>
+
+            {/*
+              検索結果ごとにノートを選べる項目を表示する。
+              選択するとnote.idをonItemSelectへ渡し、
+              Layout.tsxのmoveToDetailがそのIDの詳細画面へ移動する。
+            */}
+
             {notes.map((note) => (
               <CommandItem
                 key={note.id}
                 title={note.title ?? '無題'}
+                onSelect={() => onItemSelect(note.id)}
               >
                 <span>{note.title ?? '無題'}</span>
               </CommandItem>
             ))}
+
           </CommandGroup>
         </CommandList>
       </Command>
