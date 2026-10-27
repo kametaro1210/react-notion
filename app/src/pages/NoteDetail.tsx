@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { useDebouncedCallback } from 'use-debounce';
 import { Editor } from '../components/Editor';
 import TitleInput from '../components/TitleInput';
 import { noteRepository } from '../modules/notes/note.repository';
@@ -70,10 +71,27 @@ export default function NoteDetail() {
     id: number,
     note: { title?: string; content?: string },
   ) => {
+    // console.log("called")
     const updatedNote = await noteRepository.update(id, note);
     noteStore.set([updatedNote]);
     return updatedNote;
   };
+
+  // ------------------------------------------------------------------
+
+  /*
+    ノート更新のタイミング調整
+
+    【目的】
+    入力のたびに更新せず、入力が止まってから保存してAPIへの通信を減らす。
+
+    【処理フロー】
+    1. タイトルや本文が変わるたびにupdateNoteを呼ぶ代わりに、実行を500ミリ秒待つ。
+    2. 待っている間に入力が変わると、待ち時間をやり直す。
+    3. 入力が止まって500ミリ秒後に、最後の入力内容でノートを更新する。
+  */
+
+  const debounced = useDebouncedCallback(updateNote, 500);
 
   // ------------------------------------------------------------------
 
@@ -88,12 +106,12 @@ export default function NoteDetail() {
       <div className="note-detail-content">
         <TitleInput 
           initialData={note} 
-          onTitleChange={(title) => updateNote(id, { title })}
+          onTitleChange={(title) => debounced(id, { title })}
         />
 
         <Editor
           initialContent={note.content}
-          onChange={(content) => updateNote(id, { content })}
+          onChange={(content) => debounced(id, { content })}
         />
       </div>
     </div>

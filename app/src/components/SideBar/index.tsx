@@ -6,7 +6,13 @@ import NoteList from '../NoteList';
 import Item from './Item';
 import UserItem from './UserItem';
 
-export default function SideBar() {
+interface Props  {
+  // 検索ボタンがクリックされたときに
+  // 親コンポーネント(Layout.tsx)へ通知するコールバック関数
+  onSearchButtonClick: () => void;
+};
+
+export default function SideBar({onSearchButtonClick} : Props) {
   
   // ノート一覧を取得したり、更新したりする機能を使えるようにする。
   const noteStore = useNoteStore();
@@ -47,7 +53,7 @@ export default function SideBar() {
             <Item
               label='検索'
               icon={FiSearch}
-              onClick={() => {}}
+              onClick={onSearchButtonClick}
             />
           </div>
           <div className='sidebar-spacer'>
