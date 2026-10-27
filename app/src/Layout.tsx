@@ -19,6 +19,9 @@ export default function Layout() {
   // ノート一覧を取得したり、更新したりする機能を使えるようにする。
   const noteStore = useNoteStore();
 
+  // 検索モーダルの開閉フラグ
+  const [isShowModal, setIsShowModal] = useState(false);
+
   // -----------------------------------------------------------------------------
 
   /*
@@ -55,7 +58,11 @@ export default function Layout() {
     <div className='layout-container'>
 
       {/* 読み込み中でなければ、サイドバーを表示する。 */}
-      {!isLoading && <SideBar />}
+      {!isLoading && 
+
+        // 検索ボタンを押した際に、モーダルを表示する(フラグをtrueにする)
+        <SideBar onSearchButtonClick={() => setIsShowModal(true)} />
+      }
       
       <main className='layout-main'>
 
@@ -63,7 +70,11 @@ export default function Layout() {
         <Outlet />
         
       </main>
-      <SearchModal />
+
+      <SearchModal 
+        isOpen={isShowModal}
+        onClose={() => setIsShowModal(false)}
+      />
     </div>
   );
 }
