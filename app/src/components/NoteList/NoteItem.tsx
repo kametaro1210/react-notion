@@ -24,6 +24,7 @@ interface Props {
   // 省略可能で、マウス操作の情報を受け取り、値を返さない関数を指定する。
   onCreate?: (event: React.MouseEvent) => void;
   onExpand?: (event: React.MouseEvent) => void;
+  onDelete?: (event: React.MouseEvent) => void;
 
   layer?: number;
   expanded?: boolean;
@@ -38,7 +39,8 @@ export default function NoteItem({
   onExpand,
   layer = 0,
   expanded = false,
-  onClick
+  onClick,
+  onDelete
 } : Props) {
 
   // カーソルがノートに乗っているかを記録し、状態に応じてアイコンを切り替える。
@@ -79,7 +81,7 @@ export default function NoteItem({
           side='right'
           forceMount
         >
-          <DropdownMenuItem onClick={() => {}}>
+          <DropdownMenuItem onClick={onDelete}>
             <FiTrash2 className='note-item-delete-icon' size={16} />
             Delete
           </DropdownMenuItem>

@@ -109,6 +109,33 @@ export default function NoteList({ layer = 0, parentId }: Props) {
 
   // -------------------------------------------------------------------
 
+  /*
+    ノートの削除処理
+
+    【目的】
+    選択したノートを削除し、ノート一覧と画面を更新する。
+
+    【処理フロー】
+    1. eからクリック操作を受け取り、noteIdで削除するノートを指定する。
+    2. e.preventDefault()でクリック時のブラウザー標準動作を止める。
+    3. APIでノートを削除し、noteStore.deleteでアプリ内の一覧からも削除する。
+    4. ホーム画面へ移動する。失敗した場合はエラーを表示する。
+  */
+
+  const deleteNote = async (e: React.MouseEvent, noteId: number) => {
+    try {
+      e.preventDefault();
+      await noteRepository.delete(noteId);
+      noteStore.delete(noteId);
+      navigate('/');
+    } catch (error) {
+      console.error(error);
+      alert('ノートの削除に失敗しました');
+    }
+  };
+
+  // -------------------------------------------------------------------
+
   return (
     <>
       {/* note.parentIdとこの一覧のparentIdが一致するノートを表示する（最初の一覧では両方未設定の親ノートが対象） */}
@@ -119,15 +146,13 @@ export default function NoteList({ layer = 0, parentId }: Props) {
             <NoteItem 
 
               /*
-                note: 
-                この行で表示するノートの情報。
-
-                onCreate: 
-                子ノート作成時に、操作情報と親ノートのIDを渡す関数。
-
-                onExpand: 
-                ノート名の左のアイコンを押したとき、
-                操作情報とノート情報を渡して子ノートを取得する関数。
+                note: 表示するノートの情報(note)。
+                onCreate: 子ノート作成時、クリック情報(e)と親ノートID(note.id)を渡す。
+                onExpand: 左のアイコンを押したとき、クリック情報(e)とノート(note)を渡して子ノートを取得する。
+                layer: ノートの階層の深さ(layer)を渡し、表示位置を決める。
+                expanded: このノートが開いているかどうかの状態を渡す。
+                onClick: ノートを選択したとき、そのノートID(note.id)を渡して詳細画面へ移動する。
+                onDelete: 削除操作時、クリック情報(e)と削除するノートID(note.id)を渡す。
               */
 
               note = {note} 
@@ -136,6 +161,7 @@ export default function NoteList({ layer = 0, parentId }: Props) {
               layer={layer}
               expanded={expanded.get(note.id)}
               onClick={() => moveToDetail(note.id)}
+              onDelete={(e) => deleteNote(e, note.id)}
             />
 
             {/* このノートのexpandedがtrueなら、子ノートの一覧を表示する。 */}
