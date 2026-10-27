@@ -57,4 +57,44 @@ export const noteRepository = {
 
 // ------------------------------------------------------------------------------
 
+  /*
+    指定したノートの取得処理
+
+    【目的】
+    指定されたIDのノートをAPIから取得し、Noteとして返す。
+
+    【処理フロー】
+    1. idを使ってAPIにノートの取得を依頼し、awaitで応答を待つ。
+    2. 応答データからNoteを作成して返す。
+        Promise<Note>は、処理完了後にNoteを返すことを表す。
+  */
+
+  async findOne(id: number): Promise<Note> {
+    const result = await api.get(`/notes/${id}`);
+    return new Note(result.data);
+  },
+
+// ------------------------------------------------------------------------------
+
+  /*
+    ノート情報の更新処理
+
+    【目的】
+    指定したノートの内容をAPIで更新し、更新後のノートを返す。
+
+    【処理フロー】
+    1. idで更新するノートを指定する。noteは更新内容を受け取る引数名で、
+        NoteDetail.tsxから渡されたtitleやcontentが入る。
+    2. noteに入った更新内容をAPIへ送り、awaitで応答を待つ。
+    3. 応答データからNoteを作成して返す。
+  */
+
+  async update(
+    id: number,
+    note: { title?: string; content?: string },
+  ): Promise<Note> {
+    const result = await api.patch(`/notes/${id}`, note);
+    return new Note(result.data);
+  },
+
 };

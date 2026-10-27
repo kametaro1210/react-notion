@@ -1,4 +1,5 @@
 import { FiPlus, FiSearch } from 'react-icons/fi';
+import { useNavigate } from 'react-router-dom';
 import { noteRepository } from '../../modules/notes/note.repository';
 import { useNoteStore } from '../../modules/notes/notes.state';
 import NoteList from '../NoteList';
@@ -10,14 +11,27 @@ export default function SideBar() {
   // ノート一覧を取得したり、更新したりする機能を使えるようにする。
   const noteStore = useNoteStore();
 
+  // useNavigateが返す画面移動用の関数を保存し、作成したノートの画面へ移動できるようにする。
+  const navigate = useNavigate();
+
   /*
-    todo : 処理フローや概要は後ほど記載
+    サイドバーからのノート新規作成処理
+
+    【目的】
+    ノートを作成して一覧に保存し、作成したノートの画面を開く。
+
+    【処理フロー】
+    1. noteRepository.create({})でAPIにノートの作成を依頼し、結果を待つ。
+    2. 作成されたノートをnoteStore.set()でアプリ内の一覧に追加する。
+    3. navigateで作成したノートの詳細画面へ移動する。
+    4. 失敗した場合はエラーを記録し、作成に失敗したことを知らせる。
   */
 
   const createNote = async () => {
     try {
       const newNote = await noteRepository.create({});
       noteStore.set([newNote]);
+      navigate(`/notes/${newNote.id}`);
     } catch (error) {
       console.error(error);
       alert('ノートの作成に失敗しました');
