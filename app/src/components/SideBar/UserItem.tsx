@@ -1,6 +1,7 @@
 import { useAtom } from 'jotai';
 import { FiChevronsLeft, FiLogOut } from 'react-icons/fi';
 import { currentUserAtom } from '../../modules/auth/current-user.state';
+import { useNoteStore } from '../../modules/notes/notes.state';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,23 +16,28 @@ export default function UserItem() {
   // アプリ全体で共有するログイン中のユーザー情報と更新関数
   const [currentUser, setCurrentUser] = useAtom(currentUserAtom);
 
+  // ノート一覧を取得したり、更新したりする機能を使えるようにする。
+  const noteStore = useNoteStore();
+
   // ------------------------------------------------------------------------------
 
   /*
     ログアウト処理
 
     【目的】
-    ログイン中のユーザー情報とトークンを削除し、ログイン画面へ戻す。
+    ログイン情報とアプリ内のノート一覧を消去し、ログイン画面へ戻す。
 
     【処理フロー】
     1. setCurrentUser(undefined)でアプリ内のユーザー情報を消去する。
-    2. localStorage.removeItem('token')で、ブラウザーに保存した'token'を削除する。
+    2. noteStore.clear()で、アプリ内に保存したノート一覧を空にする。
+    3. localStorage.removeItem('token')で、ブラウザーに保存した'token'を削除する。
         removeItemは、指定したキーの保存データを削除する処理。
-    3. ユーザー情報がなくなるとLayoutが未ログインと判断し、/signinへ移動する。
+    4. ユーザー情報がなくなるとLayoutが未ログインと判断し、/signinへ移動する。
   */
 
   const signout = async () => {
     setCurrentUser(undefined);
+    noteStore.clear();
     localStorage.removeItem('token');
   };
 
