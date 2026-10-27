@@ -41,12 +41,27 @@ export const useNoteStore = () => {
 // ----------------------------------------------------------------------
 
   /*
-    todo : 処理フローや概要は後ほど記載
+    ノート一覧の追加・更新処理
+
+    【目的】
+    新しいノートを一覧に追加し、同じIDのノートがあれば情報を更新する。
+
+    【処理フロー】
+    1. oldNotes（現在の一覧）とnewNotes（追加・更新する一覧）を結合する。
+    2. ノートIDをキーにしてまとめ、同じIDがある場合は後から処理するnewNotesの情報で置き換える。
+    3. for文でcombineNotesからノートを1件ずつnoteとして受け取る。
+        note.idをキーにnoteをuniqueNotesへ入れ、同じIDがあれば上書きする。
+    4. Object.values(uniqueNotes)でuniqueNotes内のノートだけを配列にしてreturnする。
+        setNotesは返された配列を、新しいノート一覧として保存する。
   */
 
   const set = (newNotes: Note[]) => {
     setNotes((oldNotes) => {
+
+      // oldNotes（現在の一覧）とnewNotes（追加・更新するノート）をまとめて受け取る。
       const combineNotes = [...oldNotes, ...newNotes];
+      
+      // ノートIDをキー、ノート情報を値として保存する空の入れ物を用意する。
       const uniqueNotes: { [key: number]: Note } = {};
 
       for (const note of combineNotes) {
@@ -59,6 +74,44 @@ export const useNoteStore = () => {
 
 // ----------------------------------------------------------------------
 
-  return { getAll, getOne, set };
+  /*
+    ノートと子ノートの削除処理
+
+    【目的】
+    指定したノートと、その下にあるすべての子ノートを一覧から削除する。
+
+    【処理フロー】
+    1. findChildrenIdsに削除対象のidを渡し、そのノートに属する子ノートを探す。
+    2. filterでparentIdが一致する子ノートを見つけ、mapでそのIDだけを取り出す。
+    3. concatと再帰呼び出しで、子ノートの子（孫以降）のIDもすべて集める。
+    4. setNotesで現在の一覧を調べ、削除対象のidと集めた子ノートIDに一致しないノートだけを残す。
+    5. 残ったノート一覧をアプリ内に保存する。
+  */
+
+  const deleteNote = (id: number) => {
+    const findChildrenIds = (parentId: number): number[] => {
+      const childrenIds = notes
+        .filter((note) => note.parentId == parentId)
+        .map((child) => child.id);
+      return childrenIds.concat(
+        ...childrenIds.map((childId) => findChildrenIds(childId)),
+      );
+    };
+
+    const childrenIds = findChildrenIds(id);
+    
+    setNotes((oldNotes) =>
+      oldNotes.filter((note) => ![...childrenIds, id].includes(note.id)),
+    );
+  };
+
+// ----------------------------------------------------------------------
+
+  return { 
+    getAll, 
+    getOne, 
+    set, 
+    delete: deleteNote, 
+  };
 
   };

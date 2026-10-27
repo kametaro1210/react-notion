@@ -97,4 +97,25 @@ export const noteRepository = {
     return new Note(result.data);
   },
 
+// ------------------------------------------------------------------------------
+
+  /*
+    ノートの削除処理
+
+    【目的】
+    指定したIDのノートをAPIに削除依頼する。
+
+    【処理フロー】
+    1. idで削除するノートを指定し、APIへ削除を依頼する。
+    2. awaitでAPIの処理完了を待つ。
+    3. 処理が完了したらtrueを返し、Promise<boolean>で結果を呼び出し元に知らせる。
+  */
+
+  async delete(id: number): Promise<boolean> {
+    await api.delete(`/notes/${id}`);
+    return true;
+  },
+
+// ------------------------------------------------------------------------------
+
 };
