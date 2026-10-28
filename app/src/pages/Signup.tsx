@@ -1,6 +1,6 @@
 import { useAtom } from 'jotai';
 import { useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { authRepository } from '../modules/auth/auth.repository';
 import { currentUserAtom } from '../modules/auth/current-user.state';
 import '../styles/pages/auth.css';
@@ -43,7 +43,7 @@ export default function Signup() {
   const signup = async () => {
 
     setIsSubmitting(true);
-    
+
     try {
       const { user, token } = await authRepository.signup(
         name,
@@ -69,7 +69,7 @@ export default function Signup() {
   return (
     <div className="auth-container">
       <div className="auth-wrapper">
-        <h2 className="auth-title">Notion</h2>
+        <h2 className="auth-title">Notion(アカウント登録)</h2>
         <div className="auth-form-container">
           <div className="auth-card">
             <div className="auth-form">
@@ -143,6 +143,14 @@ export default function Signup() {
               </div>
             </div>
           </div>
+
+          <div style={{ textAlign: 'center', marginTop: '16px' }}>
+            <span style={{ color: '#666', fontSize: '14px' }}>アカウントをお持ちの方は </span>
+            <Link to="/signin" style={{ color: '#2eaadc', textDecoration: 'none', fontSize: '14px' }}>
+              こちら
+            </Link>
+          </div>
+
         </div>
       </div>
     </div>
