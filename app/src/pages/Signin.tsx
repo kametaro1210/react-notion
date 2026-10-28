@@ -16,6 +16,9 @@ export default function Signin() {
   // アカウント作成の通信中かどうかを記録する状態と、その状態を更新する関数
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // エラーメッセージを画面に表示するためのステート（未定義の場合はコンポーネント内に追加）
+  const [errorMessage, setErrorMessage] = useState('');
+
   /*
     ログイン処理(サインイン)
 
@@ -24,19 +27,15 @@ export default function Signin() {
     成功した場合はログイン状態を保存する。
 
     【処理フロー】
-    1. setIsSubmitting(true)を呼び出し、ログインの通信中であることを記録する。
-        この間はログインボタンが押せない状態になる。
-    2. authRepository.signinにメールアドレスとパスワードを渡してログインを依頼し、
-        完了するまで待つ。
-    3. ログインに成功したら、受け取ったユーザー情報をアプリ全体で使う状態に保存し、
-        受け取ったトークンをブラウザーに保存する。
-    4. 失敗した場合は、エラーをコンソールに表示し、ログインに失敗したことを知らせる。
-    5. 成功・失敗にかかわらず、最後にsetIsSubmitting(false)を呼び出し、
-        通信中の状態を解除してログインボタンを押せるようにする。
+    1. 前回のエラーメッセージを消し、setIsSubmitting(true)で通信中にする。
+    2. authRepository.signinにメールアドレスとパスワードを渡し、ログインの結果を待つ。
+    3. 成功したらユーザー情報とトークンを保存する。
+    4. 失敗したら、エラー内容を画面に表示する。
+    5. 最後にsetIsSubmitting(false)で通信中の状態を解除する。
   */
 
   const signin = async () => {
-
+    setErrorMessage('');
     setIsSubmitting(true);
     
     try {
@@ -46,7 +45,17 @@ export default function Signin() {
       localStorage.setItem('token', token);
     } catch (error) {
       console.error(error);
-      alert('ログインに失敗しました');
+
+      // 型安全にエラーオブジェクトからバックエンドのメッセージを取得する
+      const err = error as Record<string, unknown>;
+      const response = err.response as { data?: { message?: string } } | undefined;
+      
+      // バックエンドからのメッセージがあればそれを表示、なければ一般的な登録失敗メッセージにする
+      // （※ error.message によるステータスコードの文字列はあえて拾わないようにしています）
+      const message = response?.data?.message || 'ユーザー登録に失敗しました';
+      
+      setErrorMessage(message);
+      // alert('ログインに失敗しました');
     } finally {
       setIsSubmitting(false);
     }
@@ -63,6 +72,14 @@ export default function Signin() {
           <div className='auth-card'>
             <div className='auth-form'>
               <div>
+
+                {/* エラーメッセージが存在する場合に画面に赤字で表示する */}
+                {errorMessage && (
+                  <div style={{ color: 'red', fontSize: '14px', marginBottom: '12px', textAlign: 'center' }}>
+                    {errorMessage}
+                  </div>
+                )}
+
                 <label className='auth-label' htmlFor='email'>
                   メールアドレス
                 </label>
